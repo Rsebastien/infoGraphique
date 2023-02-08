@@ -1,11 +1,13 @@
 #version 330 core
 out vec4 FragColor;
 
+
+
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
 
-const float offset = 1.0 / 500.0;
+const float offset = 1.0 / 300.0;
 
 void main()
 {
@@ -70,4 +72,10 @@ void main()
     mapped = pow(mapped, vec3(1.0 / gamma));
 
     FragColor = vec4(mapped, 1.0);
+
+//     float brightness = dot(mapped, vec3(0.2126, 0.7152, 0.0722));
+//     if(brightness > 0.80)
+//         BrightColor = vec4(mapped, 1.0);
+//     else
+//         BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }

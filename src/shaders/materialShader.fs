@@ -1,4 +1,6 @@
 #version 330 core
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
 
 struct Material {
 //     sampler2D diffuse;
@@ -30,7 +32,7 @@ in vec3 Normal;
 in vec3 FragPos;
 in vec2 TextCoords;
 
-out vec4 FragColor;
+// out vec4 FragColor;
 
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir){
@@ -69,5 +71,10 @@ void main(){
 
     FragColor = vec4(result, 1.0);
 //     FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
+    float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > 0.80)
+        BrightColor = vec4(result, 1.0);
+    else
+        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 }

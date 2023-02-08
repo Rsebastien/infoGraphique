@@ -90,6 +90,8 @@ int main() {
     Shader lightCubeShader((path / "src/shaders/lightShader.vs").c_str(), (path / "src/shaders/lightShader.fs").c_str());
     Shader screenShader((path / "src/shaders/screenShader.vs").c_str(), (path / "src/shaders/screenShader.fs").c_str());
     Shader normalShader((path / "src/shaders/normal.vs").c_str(), (path / "src/shaders/normal.fs").c_str(), (path / "src/shaders/normal.gs").c_str());
+    Shader gaussianShader((path / "src/shaders/filtreGaussien.vs").c_str(), (path / "src/shaders/filtreGaussien.fs").c_str());
+    Shader bloomShader((path / "src/shaders/bloom.vs").c_str(), (path / "src/shaders/bloom.fs").c_str());
 
     //cube pour les lumières
     float vertices[] = {
@@ -157,7 +159,7 @@ int main() {
     vector<vector<glm::vec3>> controlPoints;
 
     vector<glm::vec3> curve1 = {
-            glm::vec3(1.0f,  6.0f, 1.0f),
+            glm::vec3(1.0f,  4.0f, 1.0f),
             glm::vec3(1.0f, -1.8f, -2.2f),
             glm::vec3(1.0f, 1.6f, -5.8f),
             glm::vec3(1.0f,  2.6f, -9.3f)
@@ -197,21 +199,42 @@ int main() {
 
     /// frame buffer
 
-    unsigned int FBO;
-    glGenFramebuffers(1, &FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+//    unsigned int FBO;
+//    glGenFramebuffers(1, &FBO);
+//    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+//
+//    // generate texture
+//    unsigned int textureColorbuffer;
+//    glGenTextures(1, &textureColorbuffer);
+//    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    glBindTexture(GL_TEXTURE_2D, 0);
+//
+//    // attach it to currently bound framebuffer object
+//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, textureColorbuffer, 0);
 
-    // generate texture
-    unsigned int textureColorbuffer;
-    glGenTextures(1, &textureColorbuffer);
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
 
-    // attach it to currently bound framebuffer object
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+    // set up floating point framebuffer to render scene to
+    unsigned int hdrFBO;
+    glGenFramebuffers(1, &hdrFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    unsigned int colorBuffers[2];
+    glGenTextures(2, colorBuffers);
+    for (unsigned int i = 0; i < 2; i++) {
+        glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        // attach texture to framebuffer
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
+    }
+
+
 
     unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
@@ -221,6 +244,8 @@ int main() {
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
+    unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, attachments);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
@@ -229,6 +254,25 @@ int main() {
 
 
 //    glDeleteFramebuffers(1, &FBO);
+
+    unsigned int pingpongFBO[2];
+    unsigned int pingpongBuffer[2];
+    glGenFramebuffers(2, pingpongFBO);
+    glGenTextures(2, pingpongBuffer);
+    for (unsigned int i = 0; i < 2; i++)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "Framebuffer not complete!" << std::endl;
+    }
 
 
 
@@ -282,9 +326,9 @@ int main() {
         processInput(window);
 
         // rendering commands here
-        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
         glEnable(GL_DEPTH_TEST);
-        glClearColor(0.0f, 0.4f, 0.4f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightingShader.use();
@@ -365,6 +409,38 @@ int main() {
             lightCubeShader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+        glBindVertexArray(0);
+
+
+        bool horizontal = true, first_iteration = true;
+        int amount = 10;
+        gaussianShader.use();
+        for (unsigned int i = 0; i < amount; i++)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
+            gaussianShader.setInt("horizontal", horizontal);
+            glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1] : pingpongBuffer[!horizontal]);
+            glBindVertexArray(quadVAO);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glBindVertexArray(0);
+            horizontal = !horizontal;
+            if (first_iteration)
+                first_iteration = false;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        bloomShader.use();
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+//        glActiveTexture(GL_TEXTURE1);
+//        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!horizontal]);
+//        bloomShader.setInt("bloom", true);
+//        bloomShader.setFloat("exposure", 1.0f);
+//        glBindVertexArray(quadVAO);
+//        glDrawArrays(GL_TRIANGLES, 0, 6);
+//        glBindVertexArray(0);
 
 
         // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
@@ -376,15 +452,21 @@ int main() {
 
         screenShader.use();
         glBindVertexArray(quadVAO);
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);	// use the color attachment texture as the texture of the quad plane
+//        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
+        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!horizontal]);	// use the color attachment texture as the texture of the quad plane
         glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-//    bezierCurve1.del();
-//    bezierCurve2.del();
+    glDeleteVertexArrays(1, &lightVAO);
+    glDeleteVertexArrays(1, &quadVAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &hdrFBO);
+    glDeleteBuffers(1, &quadVBO);
+
     bezierSurface.del();
     glfwTerminate();
     return 0;
