@@ -848,8 +848,8 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/home/sebastien/Documents/M1/S2/Projet Informatique graphique/cmake-build-debug",
-		"source" : "/home/sebastien/Documents/M1/S2/Projet Informatique graphique"
+		"build" : "/home/sebastien/Documents/infoGraphique/cmake-build-debug",
+		"source" : "/home/sebastien/Documents/infoGraphique"
 	},
 	"version" : 
 	{

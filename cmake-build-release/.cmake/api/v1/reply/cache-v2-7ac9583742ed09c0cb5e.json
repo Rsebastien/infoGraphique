@@ -43,7 +43,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "Debug"
+			"value" : "Release"
 		},
 		{
 			"name" : "CMAKE_CACHEFILE_DIR",
@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/sebastien/Documents/M1/S2/Projet Informatique graphique/cmake-build-debug"
+			"value" : "/home/sebastien/Documents/infoGraphique/cmake-build-release"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -543,7 +543,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/sebastien/Documents/M1/S2/Projet Informatique graphique/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "/home/sebastien/Documents/infoGraphique/cmake-build-release/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -651,7 +651,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/sebastien/Documents/M1/S2/Projet Informatique graphique"
+			"value" : "/home/sebastien/Documents/infoGraphique"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -3303,7 +3303,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/sebastien/Documents/M1/S2/Projet Informatique graphique/cmake-build-debug"
+			"value" : "/home/sebastien/Documents/infoGraphique/cmake-build-release"
 		},
 		{
 			"name" : "playGround_IS_TOP_LEVEL",
@@ -3327,7 +3327,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/sebastien/Documents/M1/S2/Projet Informatique graphique"
+			"value" : "/home/sebastien/Documents/infoGraphique"
 		},
 		{
 			"name" : "prefix_result",

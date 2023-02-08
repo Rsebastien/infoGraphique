@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "main::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-main-Debug-ca346cbf7a0cba744c1d.json",
+					"jsonFile" : "target-main-Debug-40fa5aa10fa496e5fd62.json",
 					"name" : "main",
 					"projectIndex" : 0
 				}
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/home/sebastien/Documents/M1/S2/Projet Informatique graphique/cmake-build-debug",
-		"source" : "/home/sebastien/Documents/M1/S2/Projet Informatique graphique"
+		"build" : "/home/sebastien/Documents/infoGraphique/cmake-build-debug",
+		"source" : "/home/sebastien/Documents/infoGraphique"
 	},
 	"version" : 
 	{

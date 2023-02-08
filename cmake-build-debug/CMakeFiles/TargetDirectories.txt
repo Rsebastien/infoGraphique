@@ -1,3 +1,3 @@
-/home/sebastien/Documents/M1/S2/Projet Informatique graphique/cmake-build-debug/CMakeFiles/main.dir
-/home/sebastien/Documents/M1/S2/Projet Informatique graphique/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/sebastien/Documents/M1/S2/Projet Informatique graphique/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/sebastien/Documents/infoGraphique/cmake-build-debug/CMakeFiles/main.dir
+/home/sebastien/Documents/infoGraphique/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/sebastien/Documents/infoGraphique/cmake-build-debug/CMakeFiles/rebuild_cache.dir
