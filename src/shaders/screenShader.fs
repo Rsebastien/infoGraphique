@@ -1,8 +1,6 @@
 #version 330 core
 out vec4 FragColor;
 
-
-
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
@@ -66,11 +64,11 @@ void main()
     vec3 hdrColor = texture(screenTexture, TexCoords).rgb;
 
     // exposure tone mapping
-//     vec3 mapped = vec3(1.0) - exp(-hdrColor * 1.0);
+    vec3 mapped = vec3(1.0) - exp(-hdrColor * 1.0);
 //     gamma correction
-//     mapped = pow(mapped, vec3(1.0 / gamma));
+    mapped = pow(mapped, vec3(1.0 / 2.2));
 
-    FragColor = vec4(hdrColor, 1.0);
+    FragColor = vec4(mapped, 1.0);
 
 //     float brightness = dot(mapped, vec3(0.2126, 0.7152, 0.0722));
 //     if(brightness > 0.80)
