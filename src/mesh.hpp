@@ -19,7 +19,7 @@ public:
 
     Mesh();
     void initMesh(vector<Vertex> vertices, vector<unsigned int> indices);
-    void DrawSurface();
+    void DrawSurface(vector<unsigned int> textures);
     void DrawControls();
     void DrawBezierCurve();
     void deleteRessources();

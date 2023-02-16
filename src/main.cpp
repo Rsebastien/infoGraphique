@@ -86,7 +86,8 @@ int main() {
     filesystem::path path = filesystem::current_path();
     path = path.parent_path();
 
-    Shader lightingShader((path / "src/shaders/materialShader.vs").c_str(), (path / "src/shaders/materialShader.fs").c_str());
+    Shader lightingShader((path / "src/shaders/materialShader.vs").c_str(), (path / "src/shaders/PBR_texture_maps.fs").c_str());
+//    Shader lightingShader((path / "src/shaders/materialShader.vs").c_str(), (path / "src/shaders/PBR.fs").c_str());
     Shader lightCubeShader((path / "src/shaders/lightShader.vs").c_str(), (path / "src/shaders/lightShader.fs").c_str());
     Shader screenShader((path / "src/shaders/screenShader.vs").c_str(), (path / "src/shaders/screenShader.fs").c_str());
     Shader normalShader((path / "src/shaders/normal.vs").c_str(), (path / "src/shaders/normal.fs").c_str(), (path / "src/shaders/normal.gs").c_str());
@@ -156,8 +157,16 @@ int main() {
             glm::vec3(24.0f, 8.0f, -12.0f)
     };
 
+//    glm::vec3 pointLightColors[] = {
+//            glm::vec3(0.f),
+//            glm::vec3(8.0f,6.0f,-30.0f),
+//            glm::vec3(24.0f, 8.0f, -12.0f)
+//    };
+
+
     vector<vector<glm::vec3>> controlPoints;
 
+    /// Courbes de bézier pour la création de la surface de bézier
     vector<glm::vec3> curve1 = {
             glm::vec3(1.0f,  4.0f, 1.0f),
             glm::vec3(1.0f, -1.8f, -2.2f),
@@ -191,56 +200,61 @@ int main() {
     controlPoints.push_back(curve3);
     controlPoints.push_back(curve4);
 
-//    unsigned int M = 4; //lignes
-//    unsigned int N = 4; //colonnes
-
     BezierSurface bezierSurface(controlPoints);
 
 
+    /// Textures pour pbr/brdf
+    unsigned int albedo    = loadTexture((path / "src/textures/streaky-metal1-ue/streaky-metal1_albedo.png").c_str());
+    unsigned int normal    = loadTexture((path / "src/textures/streaky-metal1-ue/streaky-metal1_normal-dx.png").c_str());
+    unsigned int metallic  = loadTexture((path / "src/textures/streaky-metal1-ue/streaky-metal1_metallic.png").c_str());
+    unsigned int roughness = loadTexture((path / "src/textures/streaky-metal1-ue/streaky-metal1_roughness.png").c_str());
+    unsigned int ao        = loadTexture((path / "src/textures/streaky-metal1-ue/streaky-metal1_ao.png").c_str());
+
+    vector<unsigned int> textures;
+    textures.push_back(albedo);
+    textures.push_back(normal);
+    textures.push_back(metallic);
+    textures.push_back(roughness);
+    textures.push_back(ao);
+
+
     /// frame buffer
-
-//    unsigned int FBO;
-//    glGenFramebuffers(1, &FBO);
-//    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-//
-//    // generate texture
-//    unsigned int textureColorbuffer;
-//    glGenTextures(1, &textureColorbuffer);
-//    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    glBindTexture(GL_TEXTURE_2D, 0);
-//
-//    // attach it to currently bound framebuffer object
-//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, textureColorbuffer, 0);
-
-
     // set up floating point framebuffer to render scene to
-    unsigned int hdrFBO;
-    glGenFramebuffers(1, &hdrFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
-    unsigned int colorBuffers[2];
-    glGenTextures(2, colorBuffers);
-    for (unsigned int i = 0; i < 2; i++) {
-        glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        // attach texture to framebuffer
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
-    }
+//    unsigned int hdrFBO;
+//    glGenFramebuffers(1, &hdrFBO);
+//    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+//
+//    unsigned int colorBuffers[2];
+//    glGenTextures(2, colorBuffers);
+//    for (unsigned int i = 0; i < 2; i++) {
+//        glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_FLOAT, NULL);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//        // attach texture to framebuffer
+//        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
+//    }
 
+
+    unsigned int framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    // create a color attachment texture
+    unsigned int textureColorbuffer;
+    glGenTextures(1, &textureColorbuffer);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
 
 
     unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
@@ -253,32 +267,30 @@ int main() {
 
 
 
-//    glDeleteFramebuffers(1, &FBO);
-
-    unsigned int pingpongFBO[2];
-    unsigned int pingpongBuffer[2];
-    glGenFramebuffers(2, pingpongFBO);
-    glGenTextures(2, pingpongBuffer);
-    for (unsigned int i = 0; i < 2; i++)
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0);
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "Framebuffer not complete!" << std::endl;
-    }
+//    unsigned int pingpongFBO[2];
+//    unsigned int pingpongBuffer[2];
+//    glGenFramebuffers(2, pingpongFBO);
+//    glGenTextures(2, pingpongBuffer);
+//    for (unsigned int i = 0; i < 2; i++)
+//    {
+//        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+//        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0);
+//        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+//            std::cout << "Framebuffer not complete!" << std::endl;
+//    }
 
 
 
 
     /* AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA */
 
+    // VAO et VBO pour les cubes de lumière
     unsigned int lightVAO;
     unsigned int VBO;
     glGenVertexArrays(1, &lightVAO);
@@ -289,7 +301,7 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Le quad qui va couvrir l'écran pour la texture du frame buffer
+    // Le quad qui va couvrir l'écran pour la texture du framebuffer
     unsigned int quadVAO, quadVBO;
     glGenVertexArrays(1, &quadVAO);
     glGenBuffers(1, &quadVBO);
@@ -300,19 +312,29 @@ int main() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    
 
 //    unsigned int diffuseMap = loadTexture((path / "src/images/licBlue.png").c_str());
 //    unsigned int specularMap = loadTexture((path / "src/images/licGray.png").c_str());
 
     lightingShader.use();
-//    lightingShader.setInt("texture1", 0);
-//    lightingShader.setInt("texture2", 1);
-//    lightingShader.setInt("material.diffuse", 0);
-//    lightingShader.setInt("material.specular", 1);
+//    lightingShader.setVec3("albedo", 0.f, 0.8f, 0.f);
+//    lightingShader.setFloat("ao", 1.0f);
+//    lightingShader.setFloat("metallic", 1.f);
+//    lightingShader.setFloat("roughness", 0.4f);
+    lightingShader.setInt("albedoMap", 0);
+    lightingShader.setInt("normalMap", 1);
+    lightingShader.setInt("metallicMap", 2);
+    lightingShader.setInt("roughnessMap", 3);
+    lightingShader.setInt("aoMap", 4);
 
     screenShader.use();
     screenShader.setInt("screenTexture", 0);
-
+//    gaussianShader.use();
+//    gaussianShader.setInt("image", 0);
+//    bloomShader.use();
+//    bloomShader.setInt("scene", 0);
+//    bloomShader.setInt("bloomBlur", 1);
 
 
 
@@ -325,11 +347,11 @@ int main() {
         // input
         processInput(window);
 
-        // rendering commands here
-        glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
-        glEnable(GL_DEPTH_TEST);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+//        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glEnable(GL_DEPTH_TEST);
 
         lightingShader.use();
 
@@ -338,12 +360,8 @@ int main() {
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
 
-
         lightingShader.setVec3("viewPos", camera.Position);
-        lightingShader.setVec3("material.ambient", glm::vec3(0.1f, 0.18725f, 0.1745f));
-        lightingShader.setVec3("material.diffuse", glm::vec3(0.396f, 0.74151f, 0.69102f));
-        lightingShader.setVec3("material.specular", glm::vec3(0.297254f, 0.30829f, 0.306678f));
-//        lightingShader.setFloat("material.shininess", 0.1*128.0f);
+
         lightingShader.setFloat("material.shininess", 32.0f);
 
         for(int i=0; i<3; i++){
@@ -353,34 +371,22 @@ int main() {
             }else{
                 lightingShader.setVec3(pl + string("position"), pointLightPositions[i]);
             }
-            lightingShader.setVec3(string(pl) + string("ambient"), glm::vec3(0.05f, 0.05f, 0.05f));
-            lightingShader.setVec3(string(pl) + string("diffuse"), glm::vec3(0.8f, 0.8f, 0.8f));
-            lightingShader.setVec3(string(pl) + string("specular"), glm::vec3(1.0f, 1.0f, 1.0f));
             lightingShader.setFloat(string(pl) + string("constant"), 1.0f);
-            lightingShader.setFloat(string(pl) + string("linear"), 0.027f);
-            lightingShader.setFloat(string(pl) + string("quadratic"), 0.0028f);
+            lightingShader.setFloat(string(pl) + string("linear"), 0.09f);
+            lightingShader.setFloat(string(pl) + string("quadratic"), 0.032f);
+            lightingShader.setVec3(pl + string("lightColor"), glm::vec3(50.0f, 10.0f, 30.0f));
         }
-        
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_2D, diffuseMap);
-//        glActiveTexture(GL_TEXTURE1);
-//        glBindTexture(GL_TEXTURE_2D, specularMap);
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(2.0f));
         model = glm::translate(model, glm::vec3(0.f, -5.f, 2.f));
         lightingShader.setMat4("model", model);
 
-//        if(drawCurvesState){
-//            bezierCurve1.Draw(/*lightingShader*/);
-//            bezierCurve2.Draw(/*lightingShader*/);
-//        }
-
 //        if(drawSurfacesState){
 //            bezierSurface.Draw();
 //        }
 
-        bezierSurface.Draw();
+        bezierSurface.Draw(textures);
 
 //        drawPolygon();
 
@@ -389,7 +395,7 @@ int main() {
             normalShader.setMat4("projection", projection);
             normalShader.setMat4("view", view);
             normalShader.setMat4("model", model);
-            bezierSurface.Draw();
+            bezierSurface.Draw(textures);
         }
 
         lightCubeShader.use();
@@ -405,66 +411,78 @@ int main() {
             }else{
                 model = glm::translate(model,pointLightPositions[i-1]);
             }
-//            model = glm::scale(model, glm::vec3(0.5f)); // plut petit cube
+//            model = glm::scale(model, glm::vec3(0.5f)); // plus petit cube
             lightCubeShader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glBindVertexArray(0);
 
+//        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        bool horizontal = true, first_iteration = true;
-        int amount = 10;
-        gaussianShader.use();
-        for (unsigned int i = 0; i < amount; i++)
-        {
-            glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
-            gaussianShader.setInt("horizontal", horizontal);
-            glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1] : pingpongBuffer[!horizontal]);
-            glBindVertexArray(quadVAO);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            glBindVertexArray(0);
-            horizontal = !horizontal;
-            if (first_iteration)
-                first_iteration = false;
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//        bool horizontal = true, first_iteration = true;
+//        int amount = 10;
+//        gaussianShader.use();
+//        for (unsigned int i = 0; i < amount; i++) {
+//            glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
+//            gaussianShader.setInt("horizontal", horizontal);
+//            glBindTexture(GL_TEXTURE_2D, first_iteration ? colorBuffers[1] : pingpongBuffer[!horizontal]);
+//
+//            glBindVertexArray(quadVAO);
+//            glDisable(GL_DEPTH_TEST);
+//            glDrawArrays(GL_TRIANGLES, 0, 6);
+//
+//            horizontal = !horizontal;
+//            if (first_iteration)
+//                first_iteration = false;
+//        }
 
-
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//
+////        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+////        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //        bloomShader.use();
+//        glBindVertexArray(quadVAO);
+//        glDisable(GL_DEPTH_TEST);
 //        glActiveTexture(GL_TEXTURE0);
 //        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
 //        glActiveTexture(GL_TEXTURE1);
 //        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!horizontal]);
-//        bloomShader.setInt("bloom", true);
-//        bloomShader.setFloat("exposure", 1.0f);
+//        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+
+//        glClear(GL_DEPTH_BUFFER_BIT);
+//        glDisable(GL_DEPTH_TEST);
+//        bloomShader.use();
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!horizontal]);
+//        glActiveTexture(GL_TEXTURE1);
+//        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!horizontal]);
 //        glBindVertexArray(quadVAO);
 //        glDrawArrays(GL_TRIANGLES, 0, 6);
 //        glBindVertexArray(0);
 
 
-        // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+        glDisable(GL_DEPTH_TEST);
         // clear all relevant buffers
-//        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         screenShader.use();
         glBindVertexArray(quadVAO);
-//        glBindTexture(GL_TEXTURE_2D, colorBuffers[0]);
-        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!horizontal]);	// use the color attachment texture as the texture of the quad plane
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+//        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!horizontal]);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
+    glDeleteFramebuffers(1, &framebuffer);
     glDeleteVertexArrays(1, &lightVAO);
     glDeleteVertexArrays(1, &quadVAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &hdrFBO);
     glDeleteBuffers(1, &quadVBO);
 
     bezierSurface.del();

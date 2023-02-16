@@ -22,7 +22,7 @@ public:
 //    void init(BezierCurve bezierCurve1, BezierCurve bezierCurve2);
     void CalculateNormals();
     void del();
-    void Draw();
+    void Draw(vector<unsigned int> textures);
     glm::vec3 evaluateBezierSurface(float u, float v);
     glm::vec3 deCasteljau(float t, vector<glm::vec3> points);
 

@@ -51,8 +51,7 @@ void main()
 //     );
 //
 //     vec3 sampleTex[9];
-//     for(int i = 0; i < 9; i++)
-//     {
+//     for(int i = 0; i < 9; i++){
 //         sampleTex[i] = vec3(texture(screenTexture, TexCoords.st + offsets[i]));
 //     }
 //     vec3 col = vec3(0.0);
@@ -63,15 +62,15 @@ void main()
 
 //     HDR
 
-    const float gamma = 2.2;
+//     const float gamma = 2.2;
     vec3 hdrColor = texture(screenTexture, TexCoords).rgb;
 
     // exposure tone mapping
-    vec3 mapped = vec3(1.0) - exp(-hdrColor * 1.0);
-    // gamma correction
-    mapped = pow(mapped, vec3(1.0 / gamma));
+//     vec3 mapped = vec3(1.0) - exp(-hdrColor * 1.0);
+//     gamma correction
+//     mapped = pow(mapped, vec3(1.0 / gamma));
 
-    FragColor = vec4(mapped, 1.0);
+    FragColor = vec4(hdrColor, 1.0);
 
 //     float brightness = dot(mapped, vec3(0.2126, 0.7152, 0.0722));
 //     if(brightness > 0.80)

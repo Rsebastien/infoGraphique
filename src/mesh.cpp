@@ -1,6 +1,8 @@
 
 #include "mesh.hpp"
 
+#include <utility>
+
 Mesh::Mesh(){}
 
 void Mesh::initMesh(vector<Vertex> vertices, vector<unsigned int> indices){
@@ -9,8 +11,12 @@ void Mesh::initMesh(vector<Vertex> vertices, vector<unsigned int> indices){
     setupMesh();
 }
 
-void Mesh::DrawSurface(){
+void Mesh::DrawSurface(vector<unsigned int> textures){
     glBindVertexArray(VAO);
+    for(int i=0; i<textures.size(); i++){
+        glActiveTexture(GL_TEXTURE0+i);
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+    }
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

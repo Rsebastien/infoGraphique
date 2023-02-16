@@ -22,6 +22,7 @@ struct PointLight {
     vec3 diffuse;
     vec3 specular;
 };
+
 #define NR_POINT_LIGHTS 3
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 
@@ -33,7 +34,6 @@ in vec3 FragPos;
 in vec2 TextCoords;
 
 // out vec4 FragColor;
-
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir){
     vec3 lightDir = normalize(light.position - fragPos);
@@ -72,7 +72,7 @@ void main(){
     FragColor = vec4(result, 1.0);
 //     FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
     float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
-    if(brightness > 0.80)
+    if(brightness > 1.0)
         BrightColor = vec4(result, 1.0);
     else
         BrightColor = vec4(0.0, 0.0, 0.0, 1.0);

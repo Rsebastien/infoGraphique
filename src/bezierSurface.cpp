@@ -160,8 +160,8 @@ glm::vec3 BezierSurface::deCasteljau(float t, vector<glm::vec3> pointsControl){
     return elem[0];
 }
 
-void BezierSurface::Draw(){
-    surfaceMesh.DrawSurface();
+void BezierSurface::Draw(vector<unsigned int> textures){
+    surfaceMesh.DrawSurface(textures);
 }
 
 
