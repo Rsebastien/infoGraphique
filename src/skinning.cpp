@@ -94,12 +94,12 @@ void Skinning::initWeights_euclidean() {
 }
 
 // rotation/translation des os, ici une simple rotation du premier os pour voir si tout fonctionne
-void Skinning::updateBones(float angle) {
+void Skinning::updateBones(float angle, glm::vec3 axes) {
     // A FAIRE : déplacement des os
 
 //    bones[0].world_matrix = glm::rotate(bones[0].world_matrix, (float)glfwGetTime(), glm::vec3(angle));
 //    bones[1].world_matrix = glm::rotate(bones[1].world_matrix, glm::radians(angle), glm::vec3(glm::vec3(0., 0., 1.)));
-    bones[1].user_local_matrix = glm::rotate(bones[1].user_local_matrix, glm::radians(angle), glm::vec3(1., 0., 0.));
+    bones[1].user_local_matrix = glm::rotate(bones[1].user_local_matrix, glm::radians(angle), axes);
 
     rec_skinning_transformations(bones[0].ID, glm::mat4(1.));
 //    for(const Os& bone : bones){

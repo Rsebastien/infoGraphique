@@ -51,6 +51,11 @@ bool drawNormalsState = false;
 bool normalKeyPressed = false;
 bool drawCurvesState = false;
 bool updateSkinning = false;
+bool upKeyPressed = false;
+bool downKeyPressed = false;
+
+float angle = 0.;
+glm::vec3 axes(0., 0., 1.);
 
 
 BezierCurve bezierCurve1;//50 segments pas défaut
@@ -164,7 +169,7 @@ int main() {
 //        }
 
         anim.Draw(textures_pbr);
-        anim.updateBones(0.2);
+        anim.updateBones(angle, axes);
 
 
 
@@ -240,8 +245,29 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_N) == GLFW_RELEASE)
         normalKeyPressed = false;
 
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-        drawCurvesState = !drawCurvesState;
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && !upKeyPressed) {
+        angle += 0.1;
+        upKeyPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_RELEASE)
+        upKeyPressed = false;
+
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && !downKeyPressed) {
+        angle -= 0.1;
+        downKeyPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_RELEASE)
+        downKeyPressed = false;
+
+    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+        axes = glm::vec3(1., 0., 0.);
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+        axes = glm::vec3(0., 1., 0.);
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+        axes = glm::vec3(0., 0., 1.);
+
+//    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+//        drawCurvesState = !drawCurvesState;
 //    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS){

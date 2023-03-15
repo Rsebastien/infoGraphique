@@ -20,7 +20,7 @@ public:
 
     void Draw(vector<unsigned int> textures);
     void updateVertices();
-    void updateBones(float angle);
+    void updateBones(float angle, glm::vec3 axes);
     void initWeights_euclidean();
     void initWeights();
     void createBones();
