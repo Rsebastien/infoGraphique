@@ -14,7 +14,6 @@ Skinning::Skinning(BezierSurface bezierSurface){
     }
     createBones();
     initWeights();
-    updateBones(180);
 }
 
 // Création de 3 os pour une surface de bézier
@@ -27,6 +26,7 @@ void Skinning::createBones() {
 //    premier.world_matrix = glm::translate(glm::mat4(1.0), premier.Position);
     premier.world_matrix = glm::mat4(1.0);
     premier.user_local_matrix = glm::mat4(1.0);
+//    premier.user_local_matrix = glm::rotate(premier.world_matrix, glm::radians(0.2), glm::vec3(0., 1., 0.));
     premier.bind_local_matrix = glm::translate(glm::mat4(1.0), premier.Position);
     premier.bind_matrix = premier.bind_local_matrix;
 
@@ -46,9 +46,32 @@ void Skinning::createBones() {
     bones.push_back(second);
 }
 
+void Skinning::initWeights() {
+
+    for(int i=0; i<lignes; i++){
+        int count = 0;
+        for(int j=0; j<colonnes; j++){
+            if(j%10 == 0){
+                count++;
+            }
+            if(count <= 2){
+                vertices[i*colonnes+j].poids.push_back(1.);
+                vertices[i*colonnes+j].poids.push_back(0.);
+            }else if(count == 3) {
+                float poids = j % 10 * 0.1;
+                vertices[i * colonnes + j].poids.push_back(1. - poids);
+                vertices[i * colonnes + j].poids.push_back(poids);
+            }else{
+                vertices[i*colonnes+j].poids.push_back(0.);
+                vertices[i*colonnes+j].poids.push_back(1.);
+            }
+        }
+    }
+}
+
 // Initialisation des poids pour chaque sommets en fonction de la distance euclidienne entre le sommet et les os
 // Les poids sont normalisés et inversés (le plus proche a plus de poids)
-void Skinning::initWeights() {
+void Skinning::initWeights_euclidean() {
     for(int i=0; i<lignes; i++){
         for(int j=0; j<colonnes; j++){
             vector<float> tmp;
@@ -64,9 +87,7 @@ void Skinning::initWeights() {
             for(int k=0; k<tmp.size(); k++){
                 auto sum = reduce(tmp.begin(), tmp.end());
                 float tmp_norm = 1.f - (tmp[k] / sum);
-//                cout << sum << endl;
                 vertices[i*colonnes+j].poids.push_back(tmp_norm);
-//                cout << tmp_norm << endl;
             }
         }
     }
@@ -78,7 +99,7 @@ void Skinning::updateBones(float angle) {
 
 //    bones[0].world_matrix = glm::rotate(bones[0].world_matrix, (float)glfwGetTime(), glm::vec3(angle));
 //    bones[1].world_matrix = glm::rotate(bones[1].world_matrix, glm::radians(angle), glm::vec3(glm::vec3(0., 0., 1.)));
-    bones[1].user_local_matrix = glm::rotate(bones[1].user_local_matrix, glm::radians(angle), glm::vec3(glm::vec3(1., 0., 0.)));
+    bones[1].user_local_matrix = glm::rotate(bones[1].user_local_matrix, glm::radians(angle), glm::vec3(1., 0., 0.));
 
     rec_skinning_transformations(bones[0].ID, glm::mat4(1.));
 //    for(const Os& bone : bones){

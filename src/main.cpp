@@ -50,7 +50,6 @@ bool drawingModeKeyPressed = true;
 bool drawNormalsState = false;
 bool normalKeyPressed = false;
 bool drawCurvesState = false;
-bool drawSurfacesState = true;
 bool updateSkinning = false;
 
 
@@ -165,7 +164,7 @@ int main() {
 //        }
 
         anim.Draw(textures_pbr);
-        anim.updateBones(0.1);
+        anim.updateBones(0.2);
 
 
 
@@ -243,8 +242,6 @@ void processInput(GLFWwindow *window)
 
     if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
         drawCurvesState = !drawCurvesState;
-    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
-        drawSurfacesState = !drawSurfacesState;
 //    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS){

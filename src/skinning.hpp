@@ -21,6 +21,7 @@ public:
     void Draw(vector<unsigned int> textures);
     void updateVertices();
     void updateBones(float angle);
+    void initWeights_euclidean();
     void initWeights();
     void createBones();
     void rec_skinning_transformations(int id, glm::mat4 W_parent);
