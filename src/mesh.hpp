@@ -23,6 +23,7 @@ public:
     void DrawControls();
     void DrawBezierCurve();
     void deleteRessources();
+    void updateVBO(vector<Vertex> vertices_updated);
 
 private:
     vector<Vertex>       vertices;

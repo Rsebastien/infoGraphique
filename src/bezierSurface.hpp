@@ -25,11 +25,18 @@ public:
     void Draw(vector<unsigned int> textures);
     glm::vec3 evaluateBezierSurface(float u, float v);
     glm::vec3 deCasteljau(float t, vector<glm::vec3> points);
+    vector<Vertex> getSurfaceVertices();
+    vector<unsigned int> getSurfaceIndices();
+    Mesh getSurfaceMesh();
+    unsigned int getLignes();
+    unsigned int getColonnes();
 
 private:
     vector<Vertex> bezierSurfacePoints;
     vector<unsigned int> bezierSurfaceIndices;
     vector<vector<glm::vec3>> controlPoints;
+    unsigned int lignes = 0;
+    unsigned int colonnes = 0;
     int pas_u = 2;
     int pas_v = 2;
     Mesh surfaceMesh;

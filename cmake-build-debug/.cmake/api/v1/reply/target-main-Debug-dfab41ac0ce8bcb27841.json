@@ -49,7 +49,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-O3 -DNDEBUG -fdiagnostics-color=always"
+					"fragment" : "-g -fdiagnostics-color=always"
 				}
 			],
 			"includes" : 
@@ -69,7 +69,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-O3 -DNDEBUG -fdiagnostics-color=always"
+					"fragment" : "-g -fdiagnostics-color=always"
 				},
 				{
 					"fragment" : "-std=gnu++17"
@@ -99,7 +99,8 @@
 				4,
 				5,
 				6,
-				7
+				7,
+				8
 			]
 		}
 	],
@@ -109,7 +110,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-O3 -DNDEBUG",
+				"fragment" : "-g",
 				"role" : "flags"
 			},
 			{
@@ -199,14 +200,14 @@
 				4,
 				5,
 				6,
-				7
+				7,
+				8
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
-				8,
 				9,
 				10,
 				11,
@@ -214,7 +215,9 @@
 				13,
 				14,
 				15,
-				16
+				16,
+				17,
+				18
 			]
 		}
 	],
@@ -270,6 +273,12 @@
 		},
 		{
 			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "src/skinning.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
 			"path" : "includes/KHR/khrplatform.h",
 			"sourceGroupIndex" : 1
 		},
@@ -306,6 +315,11 @@
 		{
 			"backtrace" : 1,
 			"path" : "src/shaders.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "src/skinning.hpp",
 			"sourceGroupIndex" : 1
 		},
 		{

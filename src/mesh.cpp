@@ -66,3 +66,10 @@ void Mesh::setupMesh(){
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, UVcoords));
     glBindVertexArray(0);
 }
+
+void Mesh::updateVBO(vector<Vertex> vertices_updated){
+    vertices = std::move(vertices_updated);
+//    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+}

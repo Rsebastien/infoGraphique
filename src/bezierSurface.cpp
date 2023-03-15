@@ -3,33 +3,17 @@
 #include <utility>
 #include "bezierCurve.hpp"
 
-//BezierSurface::BezierSurface(){}
+
 
 BezierSurface::BezierSurface(vector<vector<glm::vec3>> controlPoints){
     this->controlPoints = std::move(controlPoints);
-    unsigned int n = 0;
-    unsigned int m = 0;
-//    for(int u=0; u<100; u+=pas_u){
-//        n = 0;
-//        for(int v=0; v<100; v+=pas_v){
-//
-//            float up = (float)u/100.f;
-//            float vp = (float)v/100.f;
-//
-//            Vertex vertex;
-//            vertex.Position = evaluateBezierSurface(up, vp);
-//            vertex.Normal = glm::vec3(0.0f);
-//            vertex.UVcoords = glm::vec2(up, vp);
-//            bezierSurfacePoints.push_back(vertex);
-//            n++;
-//        }
-//    }
+
 
     for(int u=0; u<100; u+=pas_u){
-        n++;
+        this->lignes++;
         for(int v=0; v<100; v+=pas_v){
             if(u==0)
-                m++;
+                this->colonnes++;
 
             float up = (float)u/100.f;
             float vp = (float)v/100.f;
@@ -42,33 +26,16 @@ BezierSurface::BezierSurface(vector<vector<glm::vec3>> controlPoints){
         }
     }
 
-    for(unsigned int i=0; i<n-1; i++){
-        for(unsigned int j=0; j<m-1; j++){
-            bezierSurfaceIndices.push_back(i*m+j);
-            bezierSurfaceIndices.push_back(i*m+j+1);
-            bezierSurfaceIndices.push_back((i+1)*m+j+1);
-            bezierSurfaceIndices.push_back(i*m+j);
-            bezierSurfaceIndices.push_back((i+1)*m+j+1);
-            bezierSurfaceIndices.push_back((i+1)*m+j);
+    for(unsigned int i=0; i<this->lignes-1; i++){
+        for(unsigned int j=0; j<this->colonnes-1; j++){
+            bezierSurfaceIndices.push_back(i*colonnes+j);
+            bezierSurfaceIndices.push_back(i*colonnes+j+1);
+            bezierSurfaceIndices.push_back((i+1)*colonnes+j+1);
+            bezierSurfaceIndices.push_back(i*colonnes+j);
+            bezierSurfaceIndices.push_back((i+1)*colonnes+j+1);
+            bezierSurfaceIndices.push_back((i+1)*colonnes+j);
         }
     }
-
-
-//    for (int i=0; i<bezierSurfacePoints.size()-n; i++){
-//        //Tout sauf la derniere colonne
-//        if((i+1)%n!=0){
-//
-//            //1er triangle
-//            bezierSurfaceIndices.push_back(i);
-//            bezierSurfaceIndices.push_back(i+1);
-//            bezierSurfaceIndices.push_back(i+n);
-//            //2ème triangle
-//            bezierSurfaceIndices.push_back(i+n);
-//            bezierSurfaceIndices.push_back(i+n+1);
-//            bezierSurfaceIndices.push_back(i+1);
-//
-//        }
-//    }
 
     CalculateNormals();
     surfaceMesh.initMesh(bezierSurfacePoints, bezierSurfaceIndices);
@@ -111,18 +78,7 @@ void BezierSurface::CalculateNormals(){
         for (int j=0; j<x;j++){
             normal+=bezierSurfacePoint.faces[j].Normal;
         }
-        //On lui passe la normal normalisée
-//        if(x == 1 && i == 0){
-//            bezierSurfacePoints[i].Normal = - glm::normalize(normal);
-//        }else {
-//            bezierSurfacePoints[i].Normal = glm::normalize(normal);
-//        }
-
         bezierSurfacePoint.Normal = glm::normalize(normal);
-
-//        if(i == 0 or i == 1 or i == 2)
-//            bezierSurfacePoints[i].Normal = glm::vec3(0.0f);
-
     }
 }
 
@@ -168,3 +124,24 @@ void BezierSurface::Draw(vector<unsigned int> textures){
 void BezierSurface::del(){
     surfaceMesh.deleteRessources();
 }
+
+vector<Vertex> BezierSurface::getSurfaceVertices(){
+    return this->bezierSurfacePoints;
+}
+
+vector<unsigned int> BezierSurface::getSurfaceIndices(){
+    return this->bezierSurfaceIndices;
+}
+
+Mesh BezierSurface::getSurfaceMesh(){
+    return this->surfaceMesh;
+}
+
+unsigned int BezierSurface::getLignes(){
+    return this->lignes;
+}
+
+unsigned int BezierSurface::getColonnes(){
+    return this->colonnes;
+}
+
