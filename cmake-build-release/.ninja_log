@@ -1,7 +1,0 @@
-# ninja log v5
-1	378	1650546334415561386	CMakeFiles/main.dir/src/bezierCurve.cpp.o	ec0f4d204b600bed
-0	34	1678530876078754587	build.ninja	435fab0fee5e3396
-0	491	1650546137630413123	CMakeFiles/main.dir/includes/glad/glad.c.o	bedbb9f51dbb2a37
-868	901	1650546334935564089	main	b6139997dd331a33
-1	868	1650546334903563922	CMakeFiles/main.dir/src/main.cpp.o	bbd25f171cd7b0a7
-0	2040	1650546139182423445	CMakeFiles/main.dir/includes/stb/stb_image.cpp.o	e4c55989adfabd24
